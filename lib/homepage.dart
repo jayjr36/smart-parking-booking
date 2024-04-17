@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -12,7 +13,13 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final Completer<GoogleMapController> _controller = Completer();
+  List<LatLng> routeCoordinates = [];
 
+  int postaslots = 20;
+  int mwengeslots = 25;
+  int ubungoslots = 15;
+  int mnazislots = 20;
+  int gerezanislots = 22;
   @override
   void initState() {
     super.initState();
@@ -101,7 +108,8 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1562426509-5044a121aa49?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
                   -6.825588173357321,
                   39.273032979282505,
-                  "Gerezani"),
+                  "Gerezani",
+                  gerezanislots),
             ),
             const SizedBox(width: 10.0),
             Padding(
@@ -110,7 +118,8 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1526626607369-f89fe1ed77a9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
                   -6.784741726616766,
                   39.218767750446965,
-                  "Ubungo"),
+                  "Ubungo",
+                  ubungoslots),
             ),
             const SizedBox(width: 10.0),
             Padding(
@@ -119,7 +128,8 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGNhciUyMHBhcmtpbmd8ZW58MHx8MHx8fDA%3D",
                   -6.814532286980702,
                   39.28799772774392,
-                  "Posta"),
+                  "Posta",
+                  postaslots),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -127,7 +137,8 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1543465077-db45d34b88a5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
                   -6.821214476703329,
                   39.28051110811758,
-                  "Mnazi"),
+                  "Mnazi",
+                  mnazislots),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -135,26 +146,33 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1578859695220-856a4f5edd39?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
                   -6.766000346201719,
                   39.23002729462172,
-                  "Mwenge"),
+                  "Mwenge",
+                  mwengeslots),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _boxes(
-                  "https://media.istockphoto.com/id/1490441258/photo/lot-of-used-car-for-sales-in-stock-with-sky-and-clouds.webp?b=1&s=170667a&w=0&k=20&c=fV6omVeLkajMGVbij1KBoFgAJSyUlqbFExIxh4i_0-4=",
-                  -6.85551794396956,
-                  39.27255129706642,
-                  "Uhuru"),
-            ),
+            //Padding(
+            //  padding: const EdgeInsets.all(8.0),
+            //  child: _boxes(
+            //    "https://media.istockphoto.com/id/1490441258/photo/lot-of-used-car-for-sales-in-stock-with-sky-and-clouds.webp?b=1&s=170667a&w=0&k=20&c=fV6omVeLkajMGVbij1KBoFgAJSyUlqbFExIxh4i_0-4=",
+            //    -6.85551794396956,
+            //     39.27255129706642,
+            //     "Uhuru",
+            //     uhuruslots),
+            // ),
           ],
         ),
       ),
     );
   }
 
-  Widget _boxes(String image, double lat, double long, String restaurantName) {
+  Widget _boxes(String image, double lat, double long, String restaurantName,
+      int parkingslots) {
     return GestureDetector(
       onTap: () {
-        _gotoLocation(lat, long);
+        showpopup(restaurantName, parkingslots, (int newSlots) {
+          setState(() {
+            parkingslots = newSlots;
+          });
+        });
       },
       child: FittedBox(
         child: Material(
@@ -178,7 +196,7 @@ class HomePageState extends State<HomePage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: myDetailsContainer1(restaurantName),
+                  child: myDetailsContainer1(restaurantName, parkingslots),
                 ),
               ],
             )),
@@ -186,7 +204,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  Widget myDetailsContainer1(String restaurantName) {
+  Widget myDetailsContainer1(String restaurantName, int parkingslots) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
@@ -208,6 +226,7 @@ class HomePageState extends State<HomePage> {
               fontSize: 18.0,
               fontWeight: FontWeight.bold),
         ),
+        Text("Parking slots available: $parkingslots")
       ],
     );
   }
@@ -231,100 +250,177 @@ class HomePageState extends State<HomePage> {
           ubungoMarker,
           postaMarker
         },
+        polylines: Set<Polyline>.of(_polylines.values),
       ),
     );
   }
 
+  final Map<PolylineId, Polyline> _polylines = {};
 
-Future<void> _gotoLocation(double lat, double long) async {
-  final GoogleMapController controller = await _controller.future;
-
-  // Starting position
-  double userLat = -6.814594032429642;
-  double userLong = 39.27999040811724;
-
-  // Fetch route information from Google Directions API
-  final String apiUrl =
-      "https://maps.googleapis.com/maps/api/directions/json?origin=$userLat,$userLong&destination=$lat,$long&key=YOUR_API_KEY";
-  final response = await http.get(Uri.parse(apiUrl));
-
-  if (response.statusCode == 200) {
-    final decoded = json.decode(response.body);
-    List<LatLng> points = _decodePoly(decoded["routes"][0]["overview_polyline"]["points"]);
-
-    // Create a list of LatLng objects from the decoded polyline
-    List<LatLng> routeCoordinates = List<LatLng>.from(points);
-
-    // Add user's current location to the beginning of route coordinates
-    routeCoordinates.insert(0, LatLng(userLat, userLong));
-
-    // Draw the route on the map
-    controller.animateCamera(
-      CameraUpdate.newLatLngBounds(
-        LatLngBounds(
-          southwest: LatLng(userLat, userLong),
-          northeast: LatLng(lat, long),
-        ),
-        100,
-      ),
-    );
-
-    controller.addPolyline(Polyline(
-      polylineId: PolylineId('route'),
-      points: routeCoordinates,
+  void _showRoute(List<LatLng> routeCoordinates) {
+    const PolylineId polylineId = PolylineId('route');
+    final Polyline routePolyline = Polyline(
+      polylineId: const PolylineId('route'),
       color: Colors.blue,
-      width: 4,
-    ));
-  } else {
-    throw Exception('Failed to load route');
-  }
-}
+      points: routeCoordinates,
+      width: 5,
+    );
 
-// Function to decode Google Polyline
-List<LatLng> _decodePoly(String encoded) {
-  List<LatLng> poly = [];
-  int index = 0, len = encoded.length;
-  int lat = 0, lng = 0;
-
-  while (index < len) {
-    int b, shift = 0, result = 0;
-    do {
-      b = encoded.codeUnitAt(index++) - 63;
-      result |= (b & 0x1F) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-    lat += dlat;
-
-    shift = 0;
-    result = 0;
-    do {
-      b = encoded.codeUnitAt(index++) - 63;
-      result |= (b & 0x1F) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-    lng += dlng;
-
-    double latlng = lat / 1E5;
-    double lnglng = lng / 1E5;
-
-    LatLng position = LatLng(latlng, lnglng);
-    poly.add(position);
+    setState(() {
+      _polylines[polylineId] = routePolyline;
+    });
   }
 
-  return poly;
-}
+  void showpopup(
+      String restaurantName, int parkingSlots, Function(int) updateSlots) {
+    if (restaurantName == 'Gerezani') {
+      routeCoordinates = [
+        const LatLng(-6.815353060930553, 39.27957734971781),
+        const LatLng(-6.815907017814727, 39.28033909702955),
+        const LatLng(-6.814756491262507, 39.28161582843934),
+        const LatLng(-6.814223839132042, 39.28225419425496),
+        const LatLng(-6.814950909123785, 39.281540726702424),
+        const LatLng(-6.816053496710698, 39.28037933018597),
+        const LatLng(-6.817105480076892, 39.280095016063356),
+        const LatLng(-6.820828683652697, 39.28127518803471),
+        const LatLng(-6.82424292647016, 39.28137174747198),
+        const LatLng(-6.82609651451612, 39.278764640475494),
+        const LatLng(-6.8274707217182025, 39.27611461805896),
+        const LatLng(-6.825169721398683, 39.274365817892594),
+        const LatLng(-6.8252655966328355, 39.27403322399593),
+        // const LatLng(),
+        // LatLng(lat, long),
+      ];
+    } else if (restaurantName == 'Mwenge') {
+      routeCoordinates = [
+        const LatLng(-6.815353060930553, 39.27957734971781),
+        const LatLng(-6.815907017814727, 39.28033909702955),
+        const LatLng(-6.814756491262507, 39.28161582843934),
+        const LatLng(-6.814223839132042, 39.28225419425496),
+        const LatLng(-6.810180990339358, 39.2866503345708),
+        const LatLng(-6.803362933342494, 39.286028062327986),
+        const LatLng(-6.796906996463267, 39.28160778200808),
+        const LatLng(-6.781075735062877, 39.27431217381138),
+        const LatLng(-6.7782418203349115, 39.269870435569345),
+        const LatLng(-6.778327051087862, 39.252768671313945),
+        const LatLng(-6.775471812485749, 39.24367061831496),
+        const LatLng(-6.763816297485713, 39.22873607840942),
+        const LatLng(-6.7665437557411705, 39.23186889828605),
+        const LatLng(-6.766000346201719, 39.23002729462172),
+        // const LatLng(),
+        // LatLng(lat, long),
+      ];
+    } else if (restaurantName == 'Posta') {
+      routeCoordinates = [
+        const LatLng(-6.815353060930553, 39.27957734971781),
+        const LatLng(-6.815907017814727, 39.28033909702955),
+        const LatLng(-6.814756491262507, 39.28161582843934),
+        const LatLng(-6.814223839132042, 39.28225419425496),
+        const LatLng(-6.811736345830938, 39.28516975590098),
+        const LatLng(-6.8146978994614305, 39.28776613406208),
+        const LatLng(-6.814532286980702, 39.28799772774392),
+      ];
+    } else if (restaurantName == 'Ubungo') {
+      routeCoordinates = [
+        const LatLng(-6.815353060930553, 39.27957734971781),
+        const LatLng(-6.815907017814727, 39.28033909702955),
+        const LatLng(-6.814756491262507, 39.28161582843934),
+        const LatLng(-6.814223839132042, 39.28225419425496),
+        const LatLng(-6.810180990339358, 39.2866503345708),
+        const LatLng(-6.803362933342494, 39.286028062327986),
+        const LatLng(-6.796906996463267, 39.28160778200808),
+        const LatLng(-6.781075735062877, 39.27431217381138),
+        const LatLng(-6.7782418203349115, 39.269870435569345),
+        const LatLng(-6.778327051087862, 39.252768671313945),
+        const LatLng(-6.775471812485749, 39.24367061831496),
+        const LatLng(-6.763816297485713, 39.22873607840942),
+        const LatLng(-6.764221155754598, 39.229251062517044),
+        const LatLng(-6.779392434250391, 39.216719782797334),
+        const LatLng(-6.788682475920738, 39.20890919026892),
+        const LatLng(-6.792262077133359, 39.208265460146336),
+        const LatLng(-6.792922596101161, 39.21064726078291),
+        const LatLng(-6.784741726616766, 39.218767750446965),
+      ];
+    } else if (restaurantName == 'Mnazi') {
+      routeCoordinates = [
+        const LatLng(-6.815353060930553, 39.27957734971781),
+        const LatLng(-6.815907017814727, 39.28033909702955),
+        const LatLng(-6.814756491262507, 39.28161582843934),
+        const LatLng(-6.814223839132042, 39.28225419425496),
+        const LatLng(-6.814950909123785, 39.281540726702424),
+        const LatLng(-6.816053496710698, 39.28037933018597),
+        const LatLng(-6.817105480076892, 39.280095016063356),
+        const LatLng(-6.820828683652697, 39.28127518803471),
+      ];
+    } else {
+      const Center(
+        child: Text("No route Defined"),
+      );
+    }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            title: Text(restaurantName),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text('Parking Slots: $parkingSlots'),
+                const SizedBox(height: 20),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: () {
+                        // Book Parking
 
-  //Future<void> _gotoLocation(double lat, double long) async {
-   // final GoogleMapController controller = await _controller.future;
-   // controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-   //   target: LatLng(lat, long),
-    //  zoom: 15,
-     // tilt: 50.0,
-    //  bearing: 45.0,
-  //  )));
-  //}
+                        setState(() {
+                          parkingSlots--;
+                        });
+                         updateSlots(parkingSlots);
+                        Fluttertoast.showToast(
+                            msg: "Parking slot reserved",
+                            backgroundColor: Colors.green,
+                            fontSize: 18);
+                      },
+                      child: const Text('Book Parking'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Show Route
+                        _showRoute(routeCoordinates);
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Show Route'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          parkingSlots++;
+                        });
+                         updateSlots(parkingSlots);
+                        Fluttertoast.showToast(
+                            msg: "Thank you for using our service",
+                            backgroundColor: Colors.yellow,
+                            fontSize: 18);
+                      },
+                      child: const Text('Clear Parking'),
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Close"))
+                  ],
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
 }
 
 Marker gerezaniMarker = Marker(
@@ -377,3 +473,12 @@ Marker uhuruMarker = Marker(
     BitmapDescriptor.hueViolet,
   ),
 );
+  //Future<void> _gotoLocation(double lat, double long) async {
+  // final GoogleMapController controller = await _controller.future;
+  // controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+  //   target: LatLng(lat, long),
+  //  zoom: 15,
+  // tilt: 50.0,
+  //  bearing: 45.0,
+  //  )));
+  //}
