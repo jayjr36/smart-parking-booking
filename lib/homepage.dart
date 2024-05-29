@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttermaps/main.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -14,7 +16,10 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   final Completer<GoogleMapController> _controller = Completer();
   List<LatLng> routeCoordinates = [];
-
+   final FirebaseAuth _auth = FirebaseAuth.instance;
+ void _signOut() async {
+    await _auth.signOut();
+  }
   int postaslots = 20;
   int mwengeslots = 25;
   int ubungoslots = 15;
@@ -30,18 +35,25 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-            icon: const Icon(FontAwesomeIcons.arrowLeft),
-            onPressed: () {
-              //
-            }),
-        title: const Text("Smart Parking"),
-        actions: <Widget>[
+        backgroundColor: Colors.brown,
+        title: const Text(
+          "Smart Parking Reservation",
+          style: TextStyle(color: Colors.white),
+        ),
+        
+        actions: [
           IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                //
-              }),
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: () {
+              _signOut();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AuthenticationWrapper()),
+                (Route<dynamic> route) => false,
+              );
+            },
+          ),
         ],
       ),
       body: Stack(
@@ -236,11 +248,12 @@ class HomePageState extends State<HomePage> {
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
       child: GoogleMap(
-        mapType: MapType.normal,
+        mapType: MapType.hybrid,
         initialCameraPosition: const CameraPosition(
-            target: LatLng(-6.814594032429642, 39.27999040811724), zoom: 12),
+            target: LatLng(-6.814594032429642, 39.27999040811724), zoom: 20),
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
+          _setMapBounds(controller);
         },
         markers: {
           mnaziMarker,
@@ -250,8 +263,44 @@ class HomePageState extends State<HomePage> {
           ubungoMarker,
           postaMarker
         },
+        polygons: {
+          createRectangle(mnaziMarker.position, 'mnaziPolygon'),
+          createRectangle(mwengeMarker.position, 'mwengePolygon'),
+          createRectangle(uhuruMarker.position, 'uhuruPolygon'),
+          createRectangle(gerezaniMarker.position, 'gerezaniPolygon'),
+          createRectangle(ubungoMarker.position, 'ubungoPolygon'),
+          createRectangle(postaMarker.position, 'postaPolygon'),
+        },
         polylines: Set<Polyline>.of(_polylines.values),
       ),
+    );
+  }
+
+  Future<void> _setMapBounds(GoogleMapController controller) async {
+    // Define the bounds for Dar es Salaam
+    LatLngBounds darEsSalaamBounds = LatLngBounds(
+      southwest: const LatLng(-6.852783886932728, 39.35222429150831),
+      northeast: const LatLng(-6.676862766362094, 39.09112732792641),
+    );
+
+    // Update the map to fit within these bounds
+    await controller
+        .animateCamera(CameraUpdate.newLatLngBounds(darEsSalaamBounds, 50));
+  }
+
+  Polygon createRectangle(LatLng center, String id) {
+    const double offset = 0.001;
+    return Polygon(
+      polygonId: PolygonId(id),
+      points: [
+        LatLng(center.latitude + offset, center.longitude + offset),
+        LatLng(center.latitude + offset, center.longitude - offset),
+        LatLng(center.latitude - offset, center.longitude - offset),
+        LatLng(center.latitude - offset, center.longitude + offset),
+      ],
+      strokeWidth: 2,
+      fillColor: const Color.fromARGB(255, 253, 115, 3).withOpacity(0.5),
+      strokeColor: const Color.fromARGB(255, 82, 55, 5),
     );
   }
 
@@ -378,7 +427,7 @@ class HomePageState extends State<HomePage> {
                         setState(() {
                           parkingSlots--;
                         });
-                         updateSlots(parkingSlots);
+                        updateSlots(parkingSlots);
                         Fluttertoast.showToast(
                             msg: "Parking slot reserved",
                             backgroundColor: Colors.green,
@@ -399,7 +448,7 @@ class HomePageState extends State<HomePage> {
                         setState(() {
                           parkingSlots++;
                         });
-                         updateSlots(parkingSlots);
+                        updateSlots(parkingSlots);
                         Fluttertoast.showToast(
                             msg: "Thank you for using our service",
                             backgroundColor: Colors.yellow,
