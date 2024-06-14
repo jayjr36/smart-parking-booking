@@ -62,7 +62,7 @@ class HomePageState extends State<HomePage> {
       ),
       body: Stack(
         children: <Widget>[
-          _buildGoogleMap(context),
+          _buildMap(context),
           _buildContainer(),
         ],
       ),
@@ -234,7 +234,7 @@ Widget _boxes(String image, double lat, double long, String parkingName) {
 
 
 
-  Widget _buildGoogleMap(BuildContext context) {
+  Widget _buildMap(BuildContext context) {
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
