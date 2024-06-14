@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermaps/main.dart';
@@ -16,10 +19,11 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   final Completer<GoogleMapController> _controller = Completer();
   List<LatLng> routeCoordinates = [];
-   final FirebaseAuth _auth = FirebaseAuth.instance;
- void _signOut() async {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  void _signOut() async {
     await _auth.signOut();
   }
+
   int postaslots = 20;
   int mwengeslots = 25;
   int ubungoslots = 15;
@@ -28,6 +32,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    //initializeParkingCollection();
   }
 
   double zoomVal = 5.0;
@@ -40,7 +45,6 @@ class HomePageState extends State<HomePage> {
           "Smart Parking Reservation",
           style: TextStyle(color: Colors.white),
         ),
-        
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app),
@@ -59,50 +63,12 @@ class HomePageState extends State<HomePage> {
       body: Stack(
         children: <Widget>[
           _buildGoogleMap(context),
-          _zoomminusfunction(),
-          _zoomplusfunction(),
           _buildContainer(),
         ],
       ),
     );
   }
 
-  Widget _zoomminusfunction() {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: IconButton(
-          icon: const Icon(Icons.minimize_rounded, color: Color(0xff6200ee)),
-          onPressed: () {
-            zoomVal--;
-            _minus(zoomVal);
-          }),
-    );
-  }
-
-  Widget _zoomplusfunction() {
-    return Align(
-      alignment: Alignment.topRight,
-      child: IconButton(
-          icon: const Icon(Icons.add_a_photo_rounded, color: Color(0xff6200ee)),
-          onPressed: () {
-            zoomVal++;
-            _plus(zoomVal);
-          }),
-    );
-  }
-
-  Future<void> _minus(double zoomVal) async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: const LatLng(-6.814594032429642, 39.27999040811724),
-        zoom: zoomVal)));
-  }
-
-  Future<void> _plus(double zoomVal) async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: const LatLng(40.712776, -74.005974), zoom: zoomVal)));
-  }
 
   Widget _buildContainer() {
     return Align(
@@ -120,8 +86,8 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1562426509-5044a121aa49?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
                   -6.825588173357321,
                   39.273032979282505,
-                  "Gerezani",
-                  gerezanislots),
+                  "gerezani",
+                  ),
             ),
             const SizedBox(width: 10.0),
             Padding(
@@ -130,8 +96,8 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1526626607369-f89fe1ed77a9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
                   -6.784741726616766,
                   39.218767750446965,
-                  "Ubungo",
-                  ubungoslots),
+                  "ubungo",
+                  ),
             ),
             const SizedBox(width: 10.0),
             Padding(
@@ -140,8 +106,8 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGNhciUyMHBhcmtpbmd8ZW58MHx8MHx8fDA%3D",
                   -6.814532286980702,
                   39.28799772774392,
-                  "Posta",
-                  postaslots),
+                  "posta",
+                  ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -149,8 +115,8 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1543465077-db45d34b88a5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
                   -6.821214476703329,
                   39.28051110811758,
-                  "Mnazi",
-                  mnazislots),
+                  "mnazi",
+                  ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -158,90 +124,115 @@ class HomePageState extends State<HomePage> {
                   "https://images.unsplash.com/photo-1578859695220-856a4f5edd39?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
                   -6.766000346201719,
                   39.23002729462172,
-                  "Mwenge",
-                  mwengeslots),
+                  "mwenge",
+                  ),
             ),
-            //Padding(
-            //  padding: const EdgeInsets.all(8.0),
-            //  child: _boxes(
-            //    "https://media.istockphoto.com/id/1490441258/photo/lot-of-used-car-for-sales-in-stock-with-sky-and-clouds.webp?b=1&s=170667a&w=0&k=20&c=fV6omVeLkajMGVbij1KBoFgAJSyUlqbFExIxh4i_0-4=",
-            //    -6.85551794396956,
-            //     39.27255129706642,
-            //     "Uhuru",
-            //     uhuruslots),
-            // ),
+    
           ],
         ),
       ),
     );
   }
 
-  Widget _boxes(String image, double lat, double long, String restaurantName,
-      int parkingslots) {
-    return GestureDetector(
-      onTap: () {
-        showpopup(restaurantName, parkingslots, (int newSlots) {
-          setState(() {
-            parkingslots = newSlots;
-          });
-        });
-      },
-      child: FittedBox(
-        child: Material(
-            color: Colors.white,
-            elevation: 14.0,
-            borderRadius: BorderRadius.circular(24.0),
-            shadowColor: const Color(0x802196F3),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                SizedBox(
-                  width: 180,
-                  height: 200,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24.0),
-                    child: Image(
-                      fit: BoxFit.fill,
-                      image: NetworkImage(image),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: myDetailsContainer1(restaurantName, parkingslots),
-                ),
-              ],
-            )),
-      ),
-    );
+Widget _boxes(String image, double lat, double long, String parkingName) {
+  Stream<Map<String, dynamic>> getParkingStream(String parkingName) {
+    return FirebaseFirestore.instance
+        .collection('parking')
+        .doc(parkingName)
+        .snapshots()
+        .map((snapshot) {
+      return {
+        'parkingName': snapshot.id,
+        'availableSlots': snapshot['availableSlots'],
+      };
+    });
   }
 
-  Widget myDetailsContainer1(String restaurantName, int parkingslots) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Text(
-            restaurantName,
-            style: const TextStyle(
-                color: Color(0xff6200ee),
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold),
-          ),
-        ),
-        const SizedBox(height: 5.0),
-        const Text(
-          "24 hours parking service",
-          style: TextStyle(
-              color: Colors.black54,
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold),
-        ),
-        Text("Parking slots available: $parkingslots")
-      ],
-    );
-  }
+  return GestureDetector(
+    onTap: () {
+      showpopup(parkingName, (int newSlots) {
+        setState(() {
+          // Update Firestore with the new slots value
+          FirebaseFirestore.instance
+              .collection('parking')
+              .doc(parkingName)
+              .update({'availableSlots': newSlots});
+        });
+      });
+    },
+    child: FittedBox(
+      child: Material(
+          color: Colors.white,
+          elevation: 14.0,
+          borderRadius: BorderRadius.circular(24.0),
+          shadowColor: const Color(0x802196F3),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              SizedBox(
+                width: 180,
+                height: 200,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24.0),
+                  child: Image(
+                    fit: BoxFit.fill,
+                    image: NetworkImage(image),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: myDetailsContainer1(getParkingStream(parkingName)),
+              ),
+            ],
+          )),
+    ),
+  );
+}
+
+
+ Widget myDetailsContainer1(Stream<Map<String, dynamic>> parkingStream) {
+  return StreamBuilder<Map<String, dynamic>>(
+    stream: parkingStream,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator();
+      } else if (snapshot.hasError) {
+        return Text('Error: ${snapshot.error}');
+      } else if (!snapshot.hasData) {
+        return Text('No data available');
+      } else {
+        final parkingData = snapshot.data!;
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                parkingData['parkingName'],
+                style: const TextStyle(
+                    color: Color(0xff6200ee),
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 5.0),
+            const Text(
+              "24 hours parking service",
+              style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold),
+            ),
+            Text("Parking slots available: ${parkingData['availableSlots']}")
+          ],
+        );
+      }
+    },
+  );
+}
+
+
 
   Widget _buildGoogleMap(BuildContext context) {
     return SizedBox(
@@ -250,10 +241,10 @@ class HomePageState extends State<HomePage> {
       child: GoogleMap(
         mapType: MapType.hybrid,
         initialCameraPosition: const CameraPosition(
-            target: LatLng(-6.814594032429642, 39.27999040811724), zoom: 20),
+            target: LatLng(-6.814594032429642, 39.27999040811724), zoom: 12),
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
-          _setMapBounds(controller);
+          // _setMapBounds(controller);
         },
         markers: {
           mnaziMarker,
@@ -285,7 +276,7 @@ class HomePageState extends State<HomePage> {
 
     // Update the map to fit within these bounds
     await controller
-        .animateCamera(CameraUpdate.newLatLngBounds(darEsSalaamBounds, 50));
+        .animateCamera(CameraUpdate.newLatLngBounds(darEsSalaamBounds, 10));
   }
 
   Polygon createRectangle(LatLng center, String id) {
@@ -321,8 +312,8 @@ class HomePageState extends State<HomePage> {
   }
 
   void showpopup(
-      String restaurantName, int parkingSlots, Function(int) updateSlots) {
-    if (restaurantName == 'Gerezani') {
+      String restaurantName, Function(int) updateSlots) {
+    if (restaurantName == 'gerezani') {
       routeCoordinates = [
         const LatLng(-6.815353060930553, 39.27957734971781),
         const LatLng(-6.815907017814727, 39.28033909702955),
@@ -340,7 +331,7 @@ class HomePageState extends State<HomePage> {
         // const LatLng(),
         // LatLng(lat, long),
       ];
-    } else if (restaurantName == 'Mwenge') {
+    } else if (restaurantName == 'mwenge') {
       routeCoordinates = [
         const LatLng(-6.815353060930553, 39.27957734971781),
         const LatLng(-6.815907017814727, 39.28033909702955),
@@ -359,7 +350,7 @@ class HomePageState extends State<HomePage> {
         // const LatLng(),
         // LatLng(lat, long),
       ];
-    } else if (restaurantName == 'Posta') {
+    } else if (restaurantName == 'posta') {
       routeCoordinates = [
         const LatLng(-6.815353060930553, 39.27957734971781),
         const LatLng(-6.815907017814727, 39.28033909702955),
@@ -369,7 +360,7 @@ class HomePageState extends State<HomePage> {
         const LatLng(-6.8146978994614305, 39.28776613406208),
         const LatLng(-6.814532286980702, 39.28799772774392),
       ];
-    } else if (restaurantName == 'Ubungo') {
+    } else if (restaurantName == 'ubungo') {
       routeCoordinates = [
         const LatLng(-6.815353060930553, 39.27957734971781),
         const LatLng(-6.815907017814727, 39.28033909702955),
@@ -390,7 +381,7 @@ class HomePageState extends State<HomePage> {
         const LatLng(-6.792922596101161, 39.21064726078291),
         const LatLng(-6.784741726616766, 39.218767750446965),
       ];
-    } else if (restaurantName == 'Mnazi') {
+    } else if (restaurantName == 'mnazi') {
       routeCoordinates = [
         const LatLng(-6.815353060930553, 39.27957734971781),
         const LatLng(-6.815907017814727, 39.28033909702955),
@@ -415,7 +406,7 @@ class HomePageState extends State<HomePage> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text('Parking Slots: $parkingSlots'),
+                Text('Parking Slots: $restaurantName'),
                 const SizedBox(height: 20),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -423,11 +414,11 @@ class HomePageState extends State<HomePage> {
                     ElevatedButton(
                       onPressed: () {
                         // Book Parking
-
-                        setState(() {
-                          parkingSlots--;
-                        });
-                        updateSlots(parkingSlots);
+                        bookParkingSlot(context, restaurantName);
+                        // setState(() {
+                        //   parkingSlots--;
+                        // });
+                        // updateSlots(parkingSlots);
                         Fluttertoast.showToast(
                             msg: "Parking slot reserved",
                             backgroundColor: Colors.green,
@@ -445,10 +436,11 @@ class HomePageState extends State<HomePage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        setState(() {
-                          parkingSlots++;
-                        });
-                        updateSlots(parkingSlots);
+                        clearParkingSlot(context, restaurantName);
+                        // setState(() {
+                        //   parkingSlots++;
+                        // });
+                       // updateSlots(parkingSlots);
                         Fluttertoast.showToast(
                             msg: "Thank you for using our service",
                             backgroundColor: Colors.yellow,
@@ -471,6 +463,77 @@ class HomePageState extends State<HomePage> {
     );
   }
 }
+
+Future<void> bookParkingSlot(BuildContext context, String parkingName) async {
+  DocumentReference parkingRef =
+      FirebaseFirestore.instance.collection('parking').doc(parkingName);
+  DocumentSnapshot parkingSnapshot = await parkingRef.get();
+
+  if (parkingSnapshot.exists) {
+    int availableSlots = parkingSnapshot['availableSlots'];
+    if (availableSlots > 0) {
+      await parkingRef.update({'availableSlots': availableSlots - 1});
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Booked a slot at $parkingName')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('No parking slots available at $parkingName')));
+    }
+  } else {
+    print('Error unknown parking $parkingName');
+  }
+}
+
+Future<void> clearParkingSlot(BuildContext context, String parkingName) async {
+  DocumentReference parkingRef =
+      FirebaseFirestore.instance.collection('parking').doc(parkingName);
+  DocumentSnapshot parkingSnapshot = await parkingRef.get();
+
+  if (parkingSnapshot.exists) {
+    int availableSlots = parkingSnapshot['availableSlots'];
+    if (availableSlots < 20) {
+      await parkingRef.update({'availableSlots': availableSlots + 1});
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Cleared a slot at $parkingName')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content:
+              Text('All parking slots are already empty at $parkingName')));
+    }
+  }
+}
+
+Future<void> initializeParkingCollection() async {
+  CollectionReference parkingCollection =
+      FirebaseFirestore.instance.collection('parking');
+
+  List<String> parkingNames = [
+    'mnazi',
+    'mwenge',
+    'uhuru',
+    'gerezani',
+    'ubungo',
+    'posta'
+  ];
+
+  for (String name in parkingNames) {
+    DocumentReference parkingDoc = parkingCollection.doc(name);
+    await parkingDoc.set({'availableSlots': 20});
+  }
+}
+
+Stream<List<Map<String, dynamic>>> getAvailableSlots() {
+  return FirebaseFirestore.instance.collection('parking').snapshots().map((snapshot) {
+    return snapshot.docs.map((doc) {
+      return {
+        'parkingName': doc.id,
+        'availableSlots': doc['availableSlots'],
+      };
+    }).toList();
+  });
+}
+
+
 
 Marker gerezaniMarker = Marker(
   markerId: const MarkerId('Gerezani'),
