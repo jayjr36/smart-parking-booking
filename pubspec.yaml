@@ -22,6 +22,8 @@ dependencies:
   firebase_core: ^2.32.0
   firebase_auth: ^4.20.0
   loading_overlay: ^0.3.0
+  flutter_map_geojson: ^1.0.8
+  flutter_map: ^7.0.1
 
 dev_dependencies:
   flutter_test:

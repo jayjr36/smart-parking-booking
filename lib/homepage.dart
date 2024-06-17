@@ -4,6 +4,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+//import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_geojson/flutter_map_geojson.dart';
+import 'package:fluttermaps/constants.dart';
 import 'package:fluttermaps/main.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -196,11 +199,11 @@ Widget _boxes(String image, double lat, double long, String parkingName) {
     stream: parkingStream,
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       } else if (snapshot.hasError) {
         return Text('Error: ${snapshot.error}');
       } else if (!snapshot.hasData) {
-        return Text('No data available');
+        return const Text('No data available');
       } else {
         final parkingData = snapshot.data!;
         return Column(
