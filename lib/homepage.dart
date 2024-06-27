@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:fluttermaps/constants.dart';
 import 'package:fluttermaps/main.dart';
+import 'package:fluttermaps/payment.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -72,7 +73,6 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-
   Widget _buildContainer() {
     return Align(
       alignment: Alignment.bottomLeft,
@@ -86,156 +86,152 @@ class HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _boxes(
-                  "https://images.unsplash.com/photo-1562426509-5044a121aa49?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
-                  -6.825588173357321,
-                  39.273032979282505,
-                  "gerezani",
-                  ),
+                "https://images.unsplash.com/photo-1562426509-5044a121aa49?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
+                -6.825588173357321,
+                39.273032979282505,
+                "gerezani",
+              ),
             ),
             const SizedBox(width: 10.0),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _boxes(
-                  "https://images.unsplash.com/photo-1526626607369-f89fe1ed77a9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
-                  -6.784741726616766,
-                  39.218767750446965,
-                  "ubungo",
-                  ),
+                "https://images.unsplash.com/photo-1526626607369-f89fe1ed77a9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
+                -6.784741726616766,
+                39.218767750446965,
+                "ubungo",
+              ),
             ),
             const SizedBox(width: 10.0),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _boxes(
-                  "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGNhciUyMHBhcmtpbmd8ZW58MHx8MHx8fDA%3D",
-                  -6.814532286980702,
-                  39.28799772774392,
-                  "posta",
-                  ),
+                "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGNhciUyMHBhcmtpbmd8ZW58MHx8MHx8fDA%3D",
+                -6.814532286980702,
+                39.28799772774392,
+                "posta",
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _boxes(
-                  "https://images.unsplash.com/photo-1543465077-db45d34b88a5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
-                  -6.821214476703329,
-                  39.28051110811758,
-                  "mnazi",
-                  ),
+                "https://images.unsplash.com/photo-1543465077-db45d34b88a5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
+                -6.821214476703329,
+                39.28051110811758,
+                "mnazi",
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _boxes(
-                  "https://images.unsplash.com/photo-1578859695220-856a4f5edd39?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
-                  -6.766000346201719,
-                  39.23002729462172,
-                  "mwenge",
-                  ),
+                "https://images.unsplash.com/photo-1578859695220-856a4f5edd39?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2FyJTIwcGFya2luZ3xlbnwwfHwwfHx8MA%3D%3D",
+                -6.766000346201719,
+                39.23002729462172,
+                "mwenge",
+              ),
             ),
-    
           ],
         ),
       ),
     );
   }
 
-Widget _boxes(String image, double lat, double long, String parkingName) {
-  Stream<Map<String, dynamic>> getParkingStream(String parkingName) {
-    return FirebaseFirestore.instance
-        .collection('parking')
-        .doc(parkingName)
-        .snapshots()
-        .map((snapshot) {
-      return {
-        'parkingName': snapshot.id,
-        'availableSlots': snapshot['availableSlots'],
-      };
-    });
-  }
-
-  return GestureDetector(
-    onTap: () {
-      showpopup(parkingName, (int newSlots) {
-        setState(() {
-          // Update Firestore with the new slots value
-          FirebaseFirestore.instance
-              .collection('parking')
-              .doc(parkingName)
-              .update({'availableSlots': newSlots});
-        });
+  Widget _boxes(String image, double lat, double long, String parkingName) {
+    Stream<Map<String, dynamic>> getParkingStream(String parkingName) {
+      return FirebaseFirestore.instance
+          .collection('parking')
+          .doc(parkingName)
+          .snapshots()
+          .map((snapshot) {
+        return {
+          'parkingName': snapshot.id,
+          'availableSlots': snapshot['availableSlots'],
+        };
       });
-    },
-    child: FittedBox(
-      child: Material(
-          color: Colors.white,
-          elevation: 14.0,
-          borderRadius: BorderRadius.circular(24.0),
-          shadowColor: const Color(0x802196F3),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              SizedBox(
-                width: 180,
-                height: 200,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24.0),
-                  child: Image(
-                    fit: BoxFit.fill,
-                    image: NetworkImage(image),
+    }
+
+    return GestureDetector(
+      onTap: () {
+        showpopup(parkingName, (int newSlots) {
+          setState(() {
+            // Update Firestore with the new slots value
+            FirebaseFirestore.instance
+                .collection('parking')
+                .doc(parkingName)
+                .update({'availableSlots': newSlots});
+          });
+        });
+      },
+      child: FittedBox(
+        child: Material(
+            color: Colors.white,
+            elevation: 14.0,
+            borderRadius: BorderRadius.circular(24.0),
+            shadowColor: const Color(0x802196F3),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                SizedBox(
+                  width: 180,
+                  height: 200,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24.0),
+                    child: Image(
+                      fit: BoxFit.fill,
+                      image: NetworkImage(image),
+                    ),
                   ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: myDetailsContainer1(getParkingStream(parkingName)),
+                ),
+              ],
+            )),
+      ),
+    );
+  }
+
+  Widget myDetailsContainer1(Stream<Map<String, dynamic>> parkingStream) {
+    return StreamBuilder<Map<String, dynamic>>(
+      stream: parkingStream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData) {
+          return const Text('No data available');
+        } else {
+          final parkingData = snapshot.data!;
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: myDetailsContainer1(getParkingStream(parkingName)),
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  parkingData['parkingName'],
+                  style: const TextStyle(
+                      color: Color(0xff6200ee),
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
-            ],
-          )),
-    ),
-  );
-}
-
-
- Widget myDetailsContainer1(Stream<Map<String, dynamic>> parkingStream) {
-  return StreamBuilder<Map<String, dynamic>>(
-    stream: parkingStream,
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const CircularProgressIndicator();
-      } else if (snapshot.hasError) {
-        return Text('Error: ${snapshot.error}');
-      } else if (!snapshot.hasData) {
-        return const Text('No data available');
-      } else {
-        final parkingData = snapshot.data!;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(
-                parkingData['parkingName'],
-                style: const TextStyle(
-                    color: Color(0xff6200ee),
-                    fontSize: 24.0,
+              const SizedBox(height: 5.0),
+              const Text(
+                "24 hours parking service",
+                style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18.0,
                     fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 5.0),
-            const Text(
-              "24 hours parking service",
-              style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold),
-            ),
-            Text("Parking slots available: ${parkingData['availableSlots']}")
-          ],
-        );
-      }
-    },
-  );
-}
-
-
+              Text("Parking slots available: ${parkingData['availableSlots']}")
+            ],
+          );
+        }
+      },
+    );
+  }
 
   Widget _buildMap(BuildContext context) {
     return SizedBox(
@@ -314,8 +310,7 @@ Widget _boxes(String image, double lat, double long, String parkingName) {
     });
   }
 
-  void showpopup(
-      String restaurantName, Function(int) updateSlots) {
+  void showpopup(String restaurantName, Function(int) updateSlots) {
     if (restaurantName == 'gerezani') {
       routeCoordinates = [
         const LatLng(-6.815353060930553, 39.27957734971781),
@@ -443,7 +438,7 @@ Widget _boxes(String image, double lat, double long, String parkingName) {
                         // setState(() {
                         //   parkingSlots++;
                         // });
-                       // updateSlots(parkingSlots);
+                        // updateSlots(parkingSlots);
                         Fluttertoast.showToast(
                             msg: "Thank you for using our service",
                             backgroundColor: Colors.yellow,
@@ -475,7 +470,7 @@ Future<void> bookParkingSlot(BuildContext context, String parkingName) async {
   if (parkingSnapshot.exists) {
     int availableSlots = parkingSnapshot['availableSlots'];
     if (availableSlots > 0) {
-      await parkingRef.update({'availableSlots': availableSlots - 1});
+      //await parkingRef.update({'availableSlots': availableSlots - 1});
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Booked a slot at $parkingName')));
     } else {
@@ -495,7 +490,9 @@ Future<void> clearParkingSlot(BuildContext context, String parkingName) async {
   if (parkingSnapshot.exists) {
     int availableSlots = parkingSnapshot['availableSlots'];
     if (availableSlots < 20) {
-      await parkingRef.update({'availableSlots': availableSlots + 1});
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => PaymentScreen(parking: parkingName)));
+      //await parkingRef.update({'availableSlots': availableSlots + 1});
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Cleared a slot at $parkingName')));
     } else {
@@ -526,7 +523,10 @@ Future<void> initializeParkingCollection() async {
 }
 
 Stream<List<Map<String, dynamic>>> getAvailableSlots() {
-  return FirebaseFirestore.instance.collection('parking').snapshots().map((snapshot) {
+  return FirebaseFirestore.instance
+      .collection('parking')
+      .snapshots()
+      .map((snapshot) {
     return snapshot.docs.map((doc) {
       return {
         'parkingName': doc.id,
@@ -535,8 +535,6 @@ Stream<List<Map<String, dynamic>>> getAvailableSlots() {
     }).toList();
   });
 }
-
-
 
 Marker gerezaniMarker = Marker(
   markerId: const MarkerId('Gerezani'),
