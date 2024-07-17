@@ -24,6 +24,7 @@ dependencies:
   loading_overlay: ^0.3.0
   flutter_map_geojson: ^1.0.8
   flutter_map: ^7.0.1
+  geolocator: 
 
 dev_dependencies:
   flutter_test:

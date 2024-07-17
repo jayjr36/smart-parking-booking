@@ -20,19 +20,56 @@ class PaymentScreenState extends State<PaymentScreen> {
   final TextEditingController _expiryDateController = TextEditingController();
   final TextEditingController _cvvController = TextEditingController();
   String uid = FirebaseAuth.instance.currentUser!.uid;
-  bool isloading = false;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
   }
 
+  bool _validateCardDetails() {
+    final cardNumber = _cardNumberController.text;
+    final expiryDate = _expiryDateController.text;
+    final cvv = _cvvController.text;
+
+    // Validate card number (must be 16 digits)
+    if (cardNumber.length != 16 || !RegExp(r'^[0-9]{16}$').hasMatch(cardNumber)) {
+      return false;
+    }
+
+    // Validate expiry date (format MM/YY)
+    if (!RegExp(r'^(0[1-9]|1[0-2])\/([0-9]{2})$').hasMatch(expiryDate)) {
+      return false;
+    }
+
+    // Validate CVV (must be 3 digits)
+    if (cvv.length != 3 || !RegExp(r'^[0-9]{3}$').hasMatch(cvv)) {
+      return false;
+    }
+
+    return true;
+  }
+
   Future<void> _makePayment() async {
+    if (_amountController.text != '5000') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Payment amount must be exactly 5000 Tshs')),
+      );
+      return;
+    }
+
+    if (!_validateCardDetails()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid card details')),
+      );
+      return;
+    }
+
     try {
       setState(() {
-        isloading = true;
+        isLoading = true;
       });
-      
+
       await FirebaseFirestore.instance
           .collection('payments')
           .doc(uid)
@@ -42,18 +79,22 @@ class PaymentScreenState extends State<PaymentScreen> {
         'amount': double.parse(_amountController.text),
         'date': Timestamp.now(),
         'userId': uid,
+        'status': 'paid',
       });
+
       setState(() {
-        isloading = false;
+        isLoading = false;
       });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Payment Successful')),
       );
     } catch (e) {
       print(e);
       setState(() {
-        isloading = false;
+        isLoading = false;
       });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Payment Failed')),
       );
@@ -67,7 +108,7 @@ class PaymentScreenState extends State<PaymentScreen> {
         title: const Text('Parking Payment'),
       ),
       body: LoadingOverlay(
-        isLoading: isloading,
+        isLoading: isLoading,
         progressIndicator: const CircularProgressIndicator(),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -107,8 +148,7 @@ class PaymentScreenState extends State<PaymentScreen> {
                       .collection('payments')
                       .doc(uid)
                       .collection('mypayments')
-                      .where('userId',
-                          isEqualTo: uid) // Replace with actual user ID
+                      .where('userId', isEqualTo: uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
@@ -123,6 +163,7 @@ class PaymentScreenState extends State<PaymentScreen> {
                         var parking = payment['parking'];
                         var amount = payment['amount'];
                         var date = (payment['date'] as Timestamp).toDate();
+                        var status = payment['status'];
                         var formattedDate =
                             DateFormat('dd/MM/yyyy HH:mm').format(date);
 
@@ -130,16 +171,22 @@ class PaymentScreenState extends State<PaymentScreen> {
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(parking, 
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold, 
-                                fontSize: 18
-                                ),
-                                ),
+                              Text(parking,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18)),
                               Text('Amount: Tshs ${amount.toStringAsFixed(2)}'),
                             ],
                           ),
                           subtitle: Text('Date: $formattedDate'),
+                          trailing: Text(
+                            status,
+                            style: TextStyle(
+                              color: status == 'paid'
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
+                          ),
                         );
                       },
                     );

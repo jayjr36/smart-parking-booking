@@ -5,13 +5,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_geojson/flutter_map_geojson.dart';
-import 'package:fluttermaps/constants.dart';
 import 'package:fluttermaps/main.dart';
+import 'package:fluttermaps/parking.dart';
 import 'package:fluttermaps/payment.dart';
+import 'package:fluttermaps/reservationpage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,6 +23,7 @@ class HomePageState extends State<HomePage> {
   final Completer<GoogleMapController> _controller = Completer();
   List<LatLng> routeCoordinates = [];
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
   void _signOut() async {
     await _auth.signOut();
   }
@@ -36,14 +36,55 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    //initializeParkingCollection();
+    initializeParkingCollection();
   }
 
   double zoomVal = 5.0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.list),
+              title: const Text('Reservations'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ReservationsPage(userId: userId)),
+                );
+              },
+            ),
+                  ListTile(
+              leading: const Icon(Icons.local_parking),
+              title: const Text('Parkings Details'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ParkingDetailsPage()),
+                );
+              },
+            ),
+          
+          ],
+        ),
+      ),
       appBar: AppBar(
+        
         backgroundColor: Colors.brown,
         title: const Text(
           "Smart Parking Reservation",
@@ -139,7 +180,7 @@ class HomePageState extends State<HomePage> {
   Widget _boxes(String image, double lat, double long, String parkingName) {
     Stream<Map<String, dynamic>> getParkingStream(String parkingName) {
       return FirebaseFirestore.instance
-          .collection('parking')
+          .collection('parkings')
           .doc(parkingName)
           .snapshots()
           .map((snapshot) {
@@ -154,7 +195,6 @@ class HomePageState extends State<HomePage> {
       onTap: () {
         showpopup(parkingName, (int newSlots) {
           setState(() {
-            // Update Firestore with the new slots value
             FirebaseFirestore.instance
                 .collection('parking')
                 .doc(parkingName)
@@ -225,7 +265,7 @@ class HomePageState extends State<HomePage> {
                     fontSize: 18.0,
                     fontWeight: FontWeight.bold),
               ),
-              Text("Parking slots available: ${parkingData['availableSlots']}")
+             // Text("Parking slots available: ${parkingData['availableSlots']}")
             ],
           );
         }
@@ -243,7 +283,6 @@ class HomePageState extends State<HomePage> {
             target: LatLng(-6.814594032429642, 39.27999040811724), zoom: 12),
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
-          // _setMapBounds(controller);
         },
         markers: {
           mnaziMarker,
@@ -404,7 +443,7 @@ class HomePageState extends State<HomePage> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text('Parking Slots: $restaurantName'),
+               // Text('Parking Slots: $restaurantName'),
                 const SizedBox(height: 20),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -412,7 +451,7 @@ class HomePageState extends State<HomePage> {
                     ElevatedButton(
                       onPressed: () {
                         // Book Parking
-                        bookParkingSlot(context, restaurantName);
+                        bookParkingSlot(context,userId, restaurantName);
                         // setState(() {
                         //   parkingSlots--;
                         // });
@@ -462,36 +501,65 @@ class HomePageState extends State<HomePage> {
   }
 }
 
-Future<void> bookParkingSlot(BuildContext context, String parkingName) async {
+Future<void> bookParkingSlot(
+    BuildContext context, String userId, String parkingName) async {
   DocumentReference parkingRef =
-      FirebaseFirestore.instance.collection('parking').doc(parkingName);
+      FirebaseFirestore.instance.collection('parkings').doc(parkingName);
   DocumentSnapshot parkingSnapshot = await parkingRef.get();
 
   if (parkingSnapshot.exists) {
     int availableSlots = parkingSnapshot['availableSlots'];
     if (availableSlots > 0) {
+      // Decrease the available slots
       //await parkingRef.update({'availableSlots': availableSlots - 1});
+
+      // Create a reservation for the user
+      DocumentReference userReservationRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('reservations')
+          .doc();
+
+      await userReservationRef.set({
+        'parkingName': parkingName,
+        'timestamp': FieldValue.serverTimestamp(),
+        'status': 'active',
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Booked a slot at $parkingName')));
+
+      // Set a timer to mark the reservation as expired after 5 minutes
+      Future.delayed(const Duration(minutes: 5), () async {
+        DocumentSnapshot reservationSnapshot = await userReservationRef.get();
+        if (reservationSnapshot.exists &&
+            reservationSnapshot['status'] == 'active') {
+          await userReservationRef.update({'status': 'expired'});
+          // Increase the available slots back
+         // await parkingRef.update({'availableSlots': availableSlots});
+        }
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('No parking slots available at $parkingName')));
     }
   } else {
-    print('Error unknown parking $parkingName');
+    print('Error: unknown parking $parkingName');
   }
 }
 
 Future<void> clearParkingSlot(BuildContext context, String parkingName) async {
   DocumentReference parkingRef =
-      FirebaseFirestore.instance.collection('parking').doc(parkingName);
+      FirebaseFirestore.instance.collection('parkings').doc(parkingName);
   DocumentSnapshot parkingSnapshot = await parkingRef.get();
 
   if (parkingSnapshot.exists) {
     int availableSlots = parkingSnapshot['availableSlots'];
     if (availableSlots < 20) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => PaymentScreen(parking: parkingName)));
+          context,
+          MaterialPageRoute(
+              builder: (context) => PaymentScreen(parking: parkingName)));
       //await parkingRef.update({'availableSlots': availableSlots + 1});
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Cleared a slot at $parkingName')));
@@ -505,7 +573,7 @@ Future<void> clearParkingSlot(BuildContext context, String parkingName) async {
 
 Future<void> initializeParkingCollection() async {
   CollectionReference parkingCollection =
-      FirebaseFirestore.instance.collection('parking');
+      FirebaseFirestore.instance.collection('parkings');
 
   List<String> parkingNames = [
     'mnazi',
@@ -524,7 +592,7 @@ Future<void> initializeParkingCollection() async {
 
 Stream<List<Map<String, dynamic>>> getAvailableSlots() {
   return FirebaseFirestore.instance
-      .collection('parking')
+      .collection('parkings')
       .snapshots()
       .map((snapshot) {
     return snapshot.docs.map((doc) {
@@ -586,12 +654,3 @@ Marker uhuruMarker = Marker(
     BitmapDescriptor.hueViolet,
   ),
 );
-  //Future<void> _gotoLocation(double lat, double long) async {
-  // final GoogleMapController controller = await _controller.future;
-  // controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-  //   target: LatLng(lat, long),
-  //  zoom: 15,
-  // tilt: 50.0,
-  //  bearing: 45.0,
-  //  )));
-  //}
